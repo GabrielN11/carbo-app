@@ -1,6 +1,7 @@
 from src.server.instance import db
 from sqlalchemy import Enum
 from src.models.enum.measure import Measure
+from src.models.favorites import Favorite
 
 class Food(db.Model):
      __tablename__ = "food"

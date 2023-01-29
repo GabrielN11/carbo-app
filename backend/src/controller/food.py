@@ -4,10 +4,12 @@ from datetime import datetime, timedelta
 import jwt
 
 from src.models.food import Food
+from src.models.enum.measure import Measure
 
 from sqlalchemy import desc, func, or_
 
 from src.server.instance import api, db
+from decimal import Decimal
 
 from src.models.user import User
 
@@ -15,9 +17,9 @@ from src.utils.authorization import userAuthorization
 from env import JWT_KEY
 
 
-@api.route('/publication')
-@api.route('/publication/<id>')
-class PublicationRoute(Resource):
+@api.route('/food')
+@api.route('/food/<id>')
+class FoodRoute(Resource):
     @userAuthorization
     def post(self):
         data = api.payload
@@ -40,6 +42,8 @@ class PublicationRoute(Resource):
             
         if len(description) > 500:
             return {"error": "Descrição muito longa."}, 400
+
+        measure = Measure(measure)
 
 
         food = Food(carbo=carbo, measure=measure, name=name, description=description, quantity=quantity, author=author)
@@ -80,7 +84,7 @@ class PublicationRoute(Resource):
         try:
             food = Food.query.filter_by(id=id).first()
             food.carbo = carbo
-            food.measure = measure
+            food.measure = Measure(measure)
             food.name = name
             food.description = description
             food.quantity = quantity
@@ -108,8 +112,8 @@ class PublicationRoute(Resource):
             return {"error": "Error connecting to database. Try again later."}, 500
 
 
-@api.route('/publication-by-id/<id>')
-class PublicationByIdRoute(Resource):
+@api.route('/food-by-id/<id>')
+class FoodByIdRoute(Resource):
     
     def get(self, id):
         try:
@@ -123,12 +127,12 @@ class PublicationByIdRoute(Resource):
                 "id": food.id,
                 "name": food.name,
                 "description": food.description,
-                "carbo": food.carbo,
-                "quantity": food.quantity,
-                "measure": food.measure,
+                "carbo": float(food.carbo),
+                "quantity": float(food.quantity),
+                "measure": Measure(food.measure).value,
                 "user": {
                     "id": user.id,
-                    "name": user.name
+                    "name": user.username
                 }
             }
 
@@ -138,8 +142,8 @@ class PublicationByIdRoute(Resource):
             return {"error": "Error connecting to database. Try again later."}, 500
 
 
-@api.route('/publication-list')
-class PublicationListRoute(Resource):
+@api.route('/food-list')
+class FoodListRoute(Resource):
 
     @userAuthorization
     def get(self):
@@ -167,12 +171,12 @@ class PublicationListRoute(Resource):
                 "id": food.id,
                 "name": food.name,
                 "description": food.description,
-                "carbo": food.carbo,
-                "quantity": food.quantity,
-                "measure": food.measure,
+                "carbo": float(food.carbo),
+                "quantity": float(food.quantity),
+                "measure": Measure(food.measure).value,
                 "user": {
                     "id": user.id,
-                    "name": user.name
+                    "name": user.username
                 }
             }
             responseArray = list(map(formatPublication, food))

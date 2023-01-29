@@ -56,14 +56,15 @@ class SignUpRoute(Resource):
             Code: {validationCode}
             """
             mail.send(msg)
-            data = {
-                "id": user.id,
-            }
 
             user.validationtoken = token
 
             db.session.add(user)
             db.session.commit()
+
+            data = {
+                "id": user.id,
+            }
 
             return {"message": "Usuário criado. Por favor cheque seu e-mail para confirmar o registro.", "data": data}, 201
         except Exception as err:
@@ -76,6 +77,9 @@ class SignUpRoute(Resource):
 
         user = User.query.filter_by(id=id).first()
 
+        if user.validationtoken == None:
+            return {"error": "Esta conta já está ativada."}, 400
+
         if len(code) < 5:
             return {"error": "Código inválido."}, 400
 
@@ -86,9 +90,7 @@ class SignUpRoute(Resource):
 
 
         try:
-            user = User.query.filter_by(id=data['id']).first()
-
-            user.valid = True
+            user.active = True
             user.validationtoken = None
             db.session.add(user)
             db.session.commit()
@@ -98,7 +100,6 @@ class SignUpRoute(Resource):
             data = {
                 "id": user.id,
                 "username": user.username,
-                "name": user.name,
                 "is_admin": user.admin,
                 "token": token
             }
