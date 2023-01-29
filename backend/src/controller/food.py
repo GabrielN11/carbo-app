@@ -25,6 +25,7 @@ class FoodRoute(Resource):
         data = api.payload
         carbo = None
         measure = None
+        measureQuantity = None
         name = None
         description = None
         quantity = None
@@ -33,21 +34,31 @@ class FoodRoute(Resource):
         try:
             carbo = data['carbo']
             measure = data['measure']
+            measureQuantity = data['measureQuantity']
             name = data['name']
             description = data['description'] or ''
             quantity = data['quantity']
             author = data['userId']
         except Exception as err:
-            return {"error": "Missing data."}, 400
-            
-        if len(description) > 500:
+            try:
+                carbo = data['carbo']
+                name = data['name']
+                author = data['userId']
+            except Exception as err:
+                return {"error": "Faltando dados"}, 400
+
+        if (description != None) and (len(description) > 500):
             return {"error": "Descrição muito longa."}, 400
 
-        measure = Measure(measure)
+        if (measure != None and measureQuantity == None) or (measureQuantity == None and measure != None):
+            return {"error": "Necessário informar medida e quantidade de medida."}, 400
 
 
-        food = Food(carbo=carbo, measure=measure, name=name, description=description, quantity=quantity, author=author)
+        food = Food(carbo=carbo, name=name, description=description, quantity=quantity, author=author)
         try:
+            if measure != None:
+                food.measure = Measure(measure)
+
             db.session.add(food)
             db.session.commit()
 
@@ -72,6 +83,7 @@ class FoodRoute(Resource):
         try:
             carbo = data['carbo']
             measure = data['measure']
+            measureQuantity = data['measureQuantity']
             name = data['name']
             description = data['description'] or ''
             quantity = data['quantity']
@@ -80,6 +92,9 @@ class FoodRoute(Resource):
 
         if len(description) > 500:
             return {"error": "Descrição muito longa."}, 400
+
+        if (not measure and measureQuantity) or (not measureQuantity and measure):
+            return {"error": "É necessário haver uma quantidade e medida"}, 400
 
         try:
             food = Food.query.filter_by(id=id).first()
@@ -128,8 +143,9 @@ class FoodByIdRoute(Resource):
                 "name": food.name,
                 "description": food.description,
                 "carbo": float(food.carbo),
-                "quantity": float(food.quantity),
-                "measure": Measure(food.measure).value,
+                "quantity": None if not food.quantity else float(food.quantity),
+                "measure": None if not food.measure else Measure(food.measure).value,
+                "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
                 "user": {
                     "id": user.id,
                     "name": user.username
@@ -172,8 +188,9 @@ class FoodListRoute(Resource):
                 "name": food.name,
                 "description": food.description,
                 "carbo": float(food.carbo),
-                "quantity": float(food.quantity),
-                "measure": Measure(food.measure).value,
+                "quantity": None if not food.quantity else float(food.quantity),
+                "measure": None if not food.measure else Measure(food.measure).value,
+                "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
                 "user": {
                     "id": user.id,
                     "name": user.username

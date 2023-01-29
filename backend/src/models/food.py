@@ -8,10 +8,11 @@ class Food(db.Model):
 
      id = db.Column(db.Integer, primary_key=True)
      carbo = db.Column(db.Numeric(10, 2))
-     measure = db.Column(Enum(Measure))
+     measure = db.Column(Enum(Measure), nullable=True)
+     measureQuantity = db.Column(db.Integer, nullable=True)
      name = db.Column(db.String(50))
-     description = db.Column(db.String(500))
-     quantity = db.Column(db.Numeric(10, 2))
+     description = db.Column(db.String(500), nullable=True)
+     quantity = db.Column(db.Numeric(10, 2), nullable=True)
      active = db.Column(db.BOOLEAN, default=False)
      author = db.Column(db.Integer, db.ForeignKey('user.id'))
 
