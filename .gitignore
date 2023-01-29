@@ -1,0 +1,11 @@
+
+#BACKEND
+
+__pycache__
+/backend/env.py
+/backend/variables.py
+/backend/lib
+/backend/bin
+/backend/include
+/backend/lib64
+/backend/pyvenv.cfg
