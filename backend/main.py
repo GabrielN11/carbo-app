@@ -4,7 +4,8 @@ from src.server.instance import server
 #Routes
 
 from src.controller.auth import SignInRoute, SignUpRoute, RecoveryRoute
-from src.controller.food import FoodByIdRoute, FoodListRoute, FoodRoute
+from src.controller.food import FoodByIdRoute, FoodListRoute, FoodRoute, FoodByUserRoute
+from src.controller.favorites import FavoriteRoute
 
 
 if __name__ == "__main__":

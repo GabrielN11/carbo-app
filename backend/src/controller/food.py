@@ -6,12 +6,13 @@ import jwt
 from src.models.food import Food
 from src.models.enum.measure import Measure
 
-from sqlalchemy import desc, func, or_
+from sqlalchemy import desc, func, or_, and_
 
 from src.server.instance import api, db
 from decimal import Decimal
 
 from src.models.user import User
+from src.models.favorites import Favorite
 
 from src.utils.authorization import userAuthorization
 from env import JWT_KEY
@@ -40,12 +41,7 @@ class FoodRoute(Resource):
             quantity = data['quantity']
             author = data['userId']
         except Exception as err:
-            try:
-                carbo = data['carbo']
-                name = data['name']
-                author = data['userId']
-            except Exception as err:
-                return {"error": "Faltando dados"}, 400
+            return {"error": "Faltando dados"}, 400
 
         if (description != None) and (len(description) > 500):
             return {"error": "Descrição muito longa."}, 400
@@ -58,6 +54,7 @@ class FoodRoute(Resource):
         try:
             if measure != None:
                 food.measure = Measure(measure)
+                food.measureQuantity = measureQuantity
 
             db.session.add(food)
             db.session.commit()
@@ -137,7 +134,7 @@ class FoodByIdRoute(Resource):
                 return {"error": "Alimento não encontrado."}, 400
 
             user = User.query.filter_by(id=food.author).first()
-
+            isFavorite = Favorite.query.filter(and_(Favorite.userId == user.id, Favorite.foodId == food.id)).first()
             response = {
                 "id": food.id,
                 "name": food.name,
@@ -146,6 +143,7 @@ class FoodByIdRoute(Resource):
                 "quantity": None if not food.quantity else float(food.quantity),
                 "measure": None if not food.measure else Measure(food.measure).value,
                 "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
+                "isFavorite": bool(isFavorite),
                 "user": {
                     "id": user.id,
                     "name": user.username
@@ -157,6 +155,58 @@ class FoodByIdRoute(Resource):
             print(str(err))
             return {"error": "Error connecting to database. Try again later."}, 500
 
+@api.route('/food-by-user/<id>')
+class FoodByUserRoute(Resource):
+
+    def get(self, id):
+        limit = 10
+        page = 0
+        searchQuery = request.args.get('search')
+
+        try:
+            page = int(request.args.get('page')) * 10
+        except:
+            return {"error": "Page not informed correctly."}, 400
+
+        user = User.query.filter_by(id=id).first()
+        if user.active == False:
+            return {"error": "This user is banned."}, 403
+
+        food = []
+        try:
+            if searchQuery:
+                food = Food.query.filter(and_(Food.author == id, Food.description.ilike("%"+searchQuery.lower()+"%"))).limit(limit).offset(page).all()
+            else:
+                food = Food.query.filter(Food.author == id).limit(limit).offset(page).all()
+            
+            if len(food) == 0:
+                return None, 204
+
+            def formatPublication(food):
+                user = User.query.filter_by(id=food.author).first()
+                isFavorite = Favorite.query.filter(and_(Favorite.userId == id, Favorite.foodId == food.id)).first()
+
+                return {
+                "id": food.id,
+                "name": food.name,
+                "description": food.description,
+                "carbo": float(food.carbo),
+                "quantity": None if not food.quantity else float(food.quantity),
+                "measure": None if not food.measure else Measure(food.measure).value,
+                "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
+                "isFavorite": bool(isFavorite),
+                "user": {
+                    "id": user.id,
+                    "name": user.username
+                }
+            }
+            responseArray = list(map(formatPublication, food))
+
+            return {"message": "Alimentos encontrados.", "data": responseArray}, 200
+
+        except Exception as err:
+            print(str(err))
+            return {"error": 'Error connecting to database. Try again later.'}, 500
 
 @api.route('/food-list')
 class FoodListRoute(Resource):
@@ -166,6 +216,7 @@ class FoodListRoute(Resource):
         searchQuery = request.args.get('search')
         limit = 10
         page = 0
+        userId = jwt.decode(request.headers.get('Authorization').split()[1], JWT_KEY, algorithms="HS256")['id']
 
         try:
             page = int(request.args.get('page')) * 10
@@ -183,6 +234,7 @@ class FoodListRoute(Resource):
 
             def formatPublication(food):
                 user = User.query.filter_by(id=food.author).first()
+                isFavorite = Favorite.query.filter(and_(Favorite.userId == userId, Favorite.foodId == food.id)).first()
                 return {
                 "id": food.id,
                 "name": food.name,
@@ -191,6 +243,7 @@ class FoodListRoute(Resource):
                 "quantity": None if not food.quantity else float(food.quantity),
                 "measure": None if not food.measure else Measure(food.measure).value,
                 "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
+                "isFavorite": bool(isFavorite),
                 "user": {
                     "id": user.id,
                     "name": user.username
