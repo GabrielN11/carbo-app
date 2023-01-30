@@ -1,0 +1,19 @@
+*{
+	box-sizing: border-box;
+	text-decoration: none !important;
+}
+
+body, html{
+	margin: 0;
+	font-family: 'Roboto', sans-serif;
+}
+
+.app{
+	background: #4f2543;
+	min-height: 100vh;
+	color: #fff;
+}
+
+h1, h2{
+	font-family: 'Montserrat', sans-serif;
+}
