@@ -10,8 +10,6 @@
 			if(!localStorage.getItem('usertoken')) return
 			
 			const user = await getUser()
-
-			setContext<UserModel>('user', user.data)
 		}catch(e: any){
 
 		}
