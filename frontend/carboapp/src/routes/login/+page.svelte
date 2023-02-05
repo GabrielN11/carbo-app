@@ -1,35 +1,19 @@
 <script lang="ts">
-    import welcome from "$lib/images/svelte-welcome.webp";
-    import welcome_fallback from "$lib/images/svelte-welcome.png";
     import Textfield from "@smui/textfield";
-    import Loading from "../../components/loading/loading.svelte";
     import Button, { Label } from "@smui/button";
     import { isEmpty } from "lodash-es";
     import signIn from "$lib/api/endpoints/auth/login";
     import UserLoginModel from "../../models/user/user-login-model";
-    import { setContext, getContext } from "svelte";
-    import { redirect } from "@sveltejs/kit";
-    import ToastModel from "../../models/toast/toast-model";
-    import Toast from "../../components/toast/toast.svelte";
-    import { onMount } from 'svelte';
+    import { afterUpdate } from 'svelte';
+    import { user } from "../../stores/user-store";
+    import { goto } from '$app/navigation';
+    import { displayToast } from "../../stores/toast-store";
 
 
     let username: string = "";
     let password: string = "";
 
     let error: boolean[] = [false, false];
-    let toasts: ToastModel[] = [];
-
-    function displayToast(message: string, color: string){
-        const toastItem = new ToastModel(color, 2000, message);
-
-        toasts = [toastItem, ...toasts]
-        
-        setTimeout(() => {            
-            const last = toasts.length - 1
-            toasts = toasts.filter((_, index) => index !== last)
-        }, 2000)
-    }
 
     function validateField(index: number) {
         if(index === 0){
@@ -47,11 +31,6 @@
         }
     }
 
-    function load(){
-        redirect(302, '/')
-    }
-
-
     async function onSubmit(e: SubmitEvent) {
         e.preventDefault();
 
@@ -66,12 +45,22 @@
 
             localStorage.setItem('usertoken', res.data.token)
 
-        }catch(e: any){
-            displayToast(e.message, '#ff0000')
-        }
+            user.update(() => res.data)
 
-        
+            displayToast(`Bem-vindo ${res.data.username}!`, '#28a745', 4000)
+
+            goto('/', {replaceState: true})
+
+        }catch(e: any){
+            displayToast(e.message, '#dc3545', 2500)
+        }
     }
+
+    afterUpdate(() => {
+        if($user){
+            goto('/')
+        }
+    })
 </script>
 
 <svelte:head>
@@ -117,8 +106,8 @@
                 <Label>Entrar</Label>
             </Button>
         </fieldset>
+        <a href='/recuperar'>Esqueci minha senha</a>
     </form>
-    <Toast toast={toasts}/>
 </section>
 
 <style>

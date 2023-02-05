@@ -1,14 +1,11 @@
 <script lang="ts">
     import type ToastModel from "../../models/toast/toast-model";
     import { onMount, afterUpdate } from 'svelte';
-
-    export let toast: ToastModel[];
-
-
+    import { toasts } from "../../stores/toast-store";
 </script>
-    {#if toast.length > 0}
+    {#if $toasts.length > 0}
     <div class="warning-box">
-        {#each toast as { color, duration, text }, i}
+        {#each $toasts as { color, duration, text }, i}
             <div>
                 <div class="warning" style="background-color: {color}">
                     {text}

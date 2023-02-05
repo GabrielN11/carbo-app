@@ -223,7 +223,7 @@ class RecoveryRoute(Resource):
             db.session.add(user)
             db.session.commit()
 
-            return {"message": f"Email de recuperção enviado para {email}!", "data": {id: user.id}}, 200
+            return {"message": f"Email de recuperção enviado para {email}!", "data": {"id": user.id}}, 200
         except Exception as err:
             print(str(err))
             return {"error": "Error connecting to database. Try again later."}, 500

@@ -1,10 +1,14 @@
 <script lang="ts">
+    import { loading } from "../../stores/loading-store";
+
     export let size: number = 50;
 </script>
 
-<div class="loading-container">
-    <div class="spin" style='height: {size}px; width: {size}px'/>
-</div>
+{#if $loading}
+    <div class="loading-container">
+        <div class="spin" style="height: {size}px; width: {size}px" />
+    </div>
+{/if}
 
 <style>
     .loading-container {
