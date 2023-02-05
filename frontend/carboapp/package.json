@@ -2,6 +2,7 @@
 	"name": "carboapp",
 	"version": "0.0.1",
 	"scripts": {
+		"prepare": "smui-theme compile static/smui.css -i src/theme",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
@@ -12,10 +13,12 @@
 		"@fontsource/fira-mono": "^4.5.10",
 		"@iconify/svelte": "^3.1.0",
 		"@neoconfetti/svelte": "^1.0.0",
+		"@smui/button": "^7.0.0-beta.0",
 		"@smui/textfield": "^7.0.0-beta.0",
 		"@sveltejs/adapter-auto": "^1.0.0",
 		"@sveltejs/kit": "^1.0.0",
 		"@types/cookie": "^0.5.1",
+		"@types/lodash-es": "^4.17.6",
 		"smui-theme": "^7.0.0-beta.0",
 		"svelte": "^3.54.0",
 		"svelte-check": "^3.0.1",
@@ -25,6 +28,8 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"axios": "^1.2.6"
+		"axios": "^1.2.6",
+		"lodash-es": "^4.17.21",
+		"svelte-material-ui": "^7.0.0-beta.0"
 	}
 }

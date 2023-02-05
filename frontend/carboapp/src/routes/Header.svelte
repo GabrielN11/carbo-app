@@ -1,28 +1,32 @@
 <script lang="ts">
 	import Icon from "@iconify/svelte";
-	import { getContext } from "svelte";
+	import { getContext, afterUpdate } from "svelte";
 	import type UserModel from "../models/user/user-model";
 	import { page } from "$app/stores";
 
-	const user = getContext<UserModel>("user");
+	let user = getContext<UserModel>("user");
+
+	afterUpdate(() => {
+		user = getContext<UserModel>("user");
+	})
 </script>
 
 <header>
 	<div class="header-container">
 		<a href='/'>
-			<Icon icon="fa6-solid:wheat-awn" color="white" height="25" />
+			<iconify-icon icon="fa6-solid:wheat-awn" style="color: white;" width='25'></iconify-icon>
 			<h1 class="main-title">Carbo App</h1>
 		</a>
 	</div>
 	<div class="header-container">
 		{#if user}
 			<a href="/">
-				<Icon icon="mdi:user" color="white" height="25" />
+				<iconify-icon icon="mdi:user" style="color: white;" width='25'></iconify-icon>
 				<p>{user.username}</p>
 			</a>
 		{:else if $page.route.id !== "/login"}
 			<a href="/login">
-				<Icon icon="ri:login-circle-fill" color="white" height="25" />
+				<iconify-icon icon="ri:login-circle-fill" style="color: white" width='25'></iconify-icon>
 				<p>Login</p>
 			</a>
 		{/if}
@@ -46,7 +50,7 @@
 	.header-container a{
 		display: flex;
 		align-items: center;
-		gap: 5px;
+		gap: 10px;
 		color: #fff;
 		cursor: pointer;
 	}

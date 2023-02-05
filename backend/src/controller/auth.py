@@ -126,8 +126,9 @@ class SignInRoute(Resource):
             user = {
                 "id": userData.id,
                 "username": userData.username,
-                "name": userData.name,
-                "is_admin": userData.admin,
+                "email": userData.email,
+                "admin": userData.admin,
+                "token": request.headers.get('Authorization').split()[1]
             }
             return {"message": "User data retrieved", "data": user}, 200
         except Exception as err:
@@ -148,15 +149,12 @@ class SignInRoute(Resource):
         userData = User.query.filter_by(username=username).first()
 
         if userData == None:
-            return {"error": "Invalid authentication."}, 400
+            return {"error": "Autenticação incorreta."}, 400
 
         if bcrypt.check_password_hash(userData.password, password):
             token = jwt.encode({"id": userData.id, 'admin': userData.admin, 'exp': datetime.utcnow() + timedelta(days=60)}, JWT_KEY, algorithm="HS256")
 
             if userData.active == False:
-                return {"error": "Esta conta está desativada."}, 403
-
-            if userData.valid == False:
                 validationCode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
 
                 token = jwt.encode({"id": userData.id, "code": validationCode, 'exp': datetime.utcnow() + timedelta(minutes=10)}, JWT_KEY, algorithm="HS256")
@@ -182,14 +180,14 @@ class SignInRoute(Resource):
             user = {
                 "id": userData.id,
                 "username": username,
-                "name": userData.name,
-                "is_admin": userData.admin,
+                "email": userData.email,
+                "admin": userData.admin,
                 "token": token
             }
 
             return {"message": "Successfully authenticated", "data": user}, 200
         else:
-            return {"error": "Invalid authentication."}, 400
+            return {"error": "Autenticação Inválida."}, 400
 
 @api.route('/recovery')
 @api.route('/recovery/<id>')
@@ -203,7 +201,7 @@ class RecoveryRoute(Resource):
         try:
             user = User.query.filter_by(email=email).first()
             if user == None:
-                return {"error": "Invalid e-mail"}, 400
+                return {"error": "E-mail inválido."}, 400
 
             recoveryCode = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
 
@@ -239,10 +237,10 @@ class RecoveryRoute(Resource):
         try:
             data = jwt.decode(user.validationtoken, JWT_KEY, algorithms="HS256")
         except:
-            return {"error": 'Invalid authentication'}, 403
+            return {"error": 'Autenticação incorreta.'}, 403
 
         if data == None or data['code'] != code:
-            return {"error": 'Invalid authentication.'}, 403
+            return {"error": 'Autenticação incorreta.'}, 403
 
         user.validationtoken = None
 

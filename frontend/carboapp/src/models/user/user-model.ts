@@ -5,7 +5,7 @@ export default class UserModel{
         public email: string = '',
         public password?: string,
         public admin: boolean = false,
-        public active: boolean = true,
+        public token: string = '',
     ){
 
     }

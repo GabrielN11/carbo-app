@@ -9,7 +9,7 @@ body, html{
 }
 
 .app{
-	background: #4f2543;
+	background: var(--mdc-theme-background, #46254f);
 	min-height: 100vh;
 	color: #fff;
 }
