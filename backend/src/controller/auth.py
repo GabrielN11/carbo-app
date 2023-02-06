@@ -100,7 +100,8 @@ class SignUpRoute(Resource):
             data = {
                 "id": user.id,
                 "username": user.username,
-                "is_admin": user.admin,
+                "email": user.email,
+                "admin": user.admin,
                 "token": token
             }
 
