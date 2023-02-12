@@ -1,4 +1,5 @@
 import type { MeasureEnum } from "../enums/measure-enum";
+import { MeasureTypeEnum } from "../enums/measure-type-enum";
 
 export class FoodUserInfo{
     constructor(
@@ -12,10 +13,11 @@ export default class FoodModel{
         public id: number = 0,
         public name: string = '',
         public carbo: number = 0,
+        public quantity: number = 0,
+        public quantityType: MeasureTypeEnum = MeasureTypeEnum.KG,
         public isFavorite: boolean = false,
-        public user: FoodUserInfo = new FoodUserInfo,
+        public user: FoodUserInfo = new FoodUserInfo(),
         public description?: string,
-        public quantity?: number,
         public measure?: MeasureEnum,
         public measureQuantity?: number,
     ){

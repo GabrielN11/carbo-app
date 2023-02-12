@@ -3,7 +3,7 @@
     import Select, { Option } from '@smui/select';
     import Button, { Label } from '@smui/button';
     import Textfield from "@smui/textfield";
-    import type { MeasureEnum } from '../../models/enums/measure-enum';
+    import { MeasureEnum } from '../../models/enums/measure-enum';
     import { isEmpty } from 'lodash-es';
     import { MeasureTypeEnum } from '../../models/enums/measure-type-enum';
     import { MeasureTypeMock } from '$lib/mocks/measure-type-mock';
@@ -17,13 +17,13 @@
     export let closeHandler: () => void;
 
     //campos
-    let name: string = ''
-    let carbo: number = 0
-    let quantity: number = 0
-    let measureType: MeasureTypeEnum = MeasureTypeEnum.MG
-    let description: string = ''
-    let measure: MeasureEnum
-    let measureQuantity: number = 0
+    export let name: string = ''
+    export let carbo: number = 0
+    export let quantity: number = 0
+    export let measureType: MeasureTypeEnum = MeasureTypeEnum.MG
+    export let description: string = ''
+    export let measure: MeasureEnum = MeasureEnum.UNITY
+    export let measureQuantity: number = 0
 
     let error: boolean[] = [false, false, false]
 
@@ -62,6 +62,13 @@
             const res = await createFood(new FoodFormModel(Number(carbo), name, Number(quantity), measureType, $user?.id, description, measure, measureQuantity))
 
             displayToast(res.message, '#28a745', 4000)
+            
+            name = ''
+            carbo = 0
+            quantity = 0
+            description = ''
+            measureQuantity = 0
+
             closeHandler()
 
         }catch(e: any){
@@ -96,6 +103,7 @@
         </fieldset>
         <fieldset>
             <Textfield
+                style='width: 100%'
                 variant="filled"
                 label="Quantidade"
                 invalid={error[2]}
@@ -106,7 +114,7 @@
             </Textfield>
         </fieldset>
         <fieldset>
-            <Select variant="filled" bind:value={measureType} label="Tipo de Medida">
+            <Select variant="filled" bind:value={measureType} label="Tipo de Medida" style='width: 100%'>
                 {#each MeasureTypeMock as mt}
                   <Option value={mt.key}>{mt.description}</Option>
                 {/each}
@@ -135,7 +143,7 @@
             </Textfield>
         </fieldset>
         <fieldset>
-            <Select variant="filled" bind:value={measure} label="Medida de Referência">
+            <Select variant="filled" bind:value={measure} label="Medida de Referência" style='width: 100%'>
                 <Option value={undefined}></Option>
                 {#each MeasureMock as mm}
                   <Option value={mm.key}>{mm.description}</Option>
@@ -144,6 +152,7 @@
         </fieldset>
         <fieldset>
             <Textfield
+                style='width: 100%'
                 variant="filled"
                 label="Quantidade da referência"
                 bind:value={measureQuantity}
@@ -165,7 +174,7 @@
 
 <style>
     .fullwidth{
-        flex-grow: 1;
+        flex-grow: 2;
         width: 100%;
     }
 
@@ -183,5 +192,6 @@
     }
     fieldset {
         border: none;
+        flex-grow: 1;
     }
 </style>

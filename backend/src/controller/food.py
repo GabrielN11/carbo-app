@@ -142,8 +142,15 @@ class FoodByIdRoute(Resource):
             if food == None:
                 return {"error": "Alimento não encontrado."}, 400
 
+            userId = None
+            
+            try:
+                userId = jwt.decode(request.headers.get('Authorization').split()[1], JWT_KEY, algorithms="HS256")['id']
+            except:
+                userId = -1
+
             user = User.query.filter_by(id=food.author).first()
-            isFavorite = Favorite.query.filter(and_(Favorite.userId == user.id, Favorite.foodId == food.id)).first()
+            isFavorite = Favorite.query.filter(and_(Favorite.userId == userId, Favorite.foodId == food.id)).first()
             response = {
                 "id": food.id,
                 "name": food.name,
@@ -152,7 +159,7 @@ class FoodByIdRoute(Resource):
                 "quantity": None if not food.quantity else float(food.quantity),
                 "measure": None if not food.measure else Measure(food.measure).value,
                 "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
-                "quantityType": food.quantityType,
+                "quantityType": MeasureType(food.quantityType).value,
                 "isFavorite": bool(isFavorite),
                 "user": {
                     "id": user.id,
