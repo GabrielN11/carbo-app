@@ -6,8 +6,8 @@ interface FoodId{
     id: number;
 }
 
-export default async function alterFood(model: FoodFormModel): Promise<SuccessfullyResponse<FoodId>> {
-    const res = await apiPut<SuccessfullyResponse<FoodId>, FoodFormModel>('/food', model, true)
+export default async function alterFood(id: number, model: FoodFormModel): Promise<SuccessfullyResponse<FoodId>> {
+    const res = await apiPut<SuccessfullyResponse<FoodId>, FoodFormModel>(`/food/${id}`, model, true)
 
     return res
 }

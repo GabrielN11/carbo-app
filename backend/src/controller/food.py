@@ -94,7 +94,7 @@ class FoodRoute(Resource):
         except Exception as err:
             return {"error": "Missing data."}, 400
 
-        if len(description) > 500:
+        if description and len(description) > 500:
             return {"error": "Descrição muito longa."}, 400
 
         if (not measure and measureQuantity) or (not measureQuantity and measure):
@@ -103,7 +103,7 @@ class FoodRoute(Resource):
         try:
             food = Food.query.filter_by(id=id).first()
             food.carbo = carbo
-            food.measure = Measure(measure)
+            food.measure = Measure(measure) if measure else None
             food.name = name
             food.description = description
             food.quantity = quantity

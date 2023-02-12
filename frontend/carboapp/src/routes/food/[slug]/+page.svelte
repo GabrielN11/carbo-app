@@ -5,17 +5,16 @@
 	import List, { Item, Text } from "@smui/list";
     import getFoodById from "$lib/api/endpoints/food/get-food-by-id";
     import { isEmpty, toNumber } from "lodash-es";
-    import { onMount } from "svelte";
+    import { onMount, afterUpdate } from "svelte";
     import FoodModel from "../../../models/food/food-model";
     import { displayToast } from "../../../stores/toast-store";
     import Tooltip, { Wrapper } from '@smui/tooltip';
-	import Fab from '@smui/fab';
     import { MeasureTypeMock } from "$lib/mocks/measure-type-mock";
     import { MeasureEnum } from "../../../models/enums/measure-enum";
     import { user } from "../../../stores/user-store";
     import Menu from "@smui/menu";
-    import Button from "@smui/button";
     import DeleteFood from "../../../components/delete-food/delete-food.svelte";
+    import AddFood from "../../../components/add-food/add-food.svelte";
 
     let id: number;
     let menu: Menu;
@@ -24,6 +23,7 @@
     let favorite: boolean = false;
 
     let openDelete: boolean = false;
+    let openEdit: boolean = false;
 
     async function fetchFood() {
         try {
@@ -48,6 +48,7 @@
             goto("/");
         }
     });
+
 </script>
 
 <svelte:head>
@@ -130,7 +131,7 @@
                         </Wrapper>
                     <Menu bind:this={menu}>
                         <List>
-                          <Item on:SMUI:action={() => console.log('clicou')}>
+                          <Item on:SMUI:action={() => (openEdit = true)}>
                             <Text>Editar</Text>
                           </Item>
                           <Item on:SMUI:action={() => (openDelete = true)}>
@@ -140,6 +141,12 @@
                       </Menu>
 
                       <DeleteFood id={id} open={openDelete} name={food.name} closeDialog={() => (openDelete = false)}/>
+                      <AddFood open={openEdit} closeHandler={() => {
+                        openEdit = false
+                        fetchFood()
+                      }} id={food.id}
+                        name={food.name} carbo={food.carbo} description={food.description} measure={food.measure}
+                        measureQuantity={food.measureQuantity} measureType={food.quantityType} quantity={food.quantity}/>
                 {:else}
                     <p>Publicado por {food.user.name}</p>
                 {/if}

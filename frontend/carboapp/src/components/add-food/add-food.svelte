@@ -13,11 +13,13 @@
     import { user } from '../../stores/user-store';
     import createFood from '$lib/api/endpoints/food/food-post';
     import { goto } from '$app/navigation';
+    import alterFood from '$lib/api/endpoints/food/put-food';
 
     export let open = true;
     export let closeHandler: () => void;
 
     //campos
+    export let id: number;
     export let name: string = ''
     export let carbo: number = 0
     export let quantity: number = 0
@@ -36,13 +38,14 @@
                 error[0] = false
             }
         }else if(index === 1){
-            if(isEmpty(carbo) || isNaN(Number(carbo))){
+            if(isEmpty(carbo.toString()) || isNaN(Number(carbo))){
                 error[1] = true
             }else{
                 error[1] = false
+
             }
         }else{
-            if(isEmpty(quantity) || isNaN(Number(quantity))){
+            if(isEmpty(quantity.toString()) || isNaN(Number(quantity))){
                 error[2] = true
             }else{
                 error[2] = false
@@ -78,6 +81,34 @@
         }
     }
 
+    async function handlePut(){
+        validateField(0)
+        validateField(1)
+        validateField(2)
+
+        if(error.includes(true)){
+            return
+        }
+
+        try{
+            const res = await alterFood(id, new FoodFormModel(Number(carbo), name, Number(quantity), measureType, $user?.id, description, measure, measureQuantity))
+
+            displayToast(res.message, '#28a745', 4000)
+            
+            name = ''
+            carbo = 0
+            quantity = 0
+            description = ''
+            measureQuantity = 0
+
+            closeHandler()
+            goto(`/food/${res.data.id}`)
+
+        }catch(e: any){
+            displayToast(e.message, '#dc3545', 4000)
+        }
+    }
+
 </script>
 
 <Dialog
@@ -87,7 +118,7 @@
   on:SMUIDialog:closed={closeHandler}
 >
   <Header>
-    <Title id="fullscreen-title">Adicionar Alimento</Title>
+    <Title id="fullscreen-title">{id ? 'Editar Alimento' : 'Adicionar Alimento'}</Title>
   </Header>
   <Content id="fullscreen-content">
     <form>
@@ -168,7 +199,7 @@
     <Button action="reject" on:click={closeHandler}>
       <Label>Cancelar</Label>
     </Button>
-    <Button touch variant="unelevated" color="primary" on:click={handleSubmit}>
+    <Button touch variant="unelevated" color="primary" on:click={id ? handlePut : handleSubmit}>
       <Label>Salvar</Label>
     </Button>
   </div>
