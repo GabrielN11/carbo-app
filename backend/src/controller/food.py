@@ -5,6 +5,7 @@ import jwt
 
 from src.models.food import Food
 from src.models.enum.measure import Measure
+from src.models.enum.measuretype import MeasureType
 
 from sqlalchemy import desc, func, or_, and_
 
@@ -30,15 +31,17 @@ class FoodRoute(Resource):
         name = None
         description = None
         quantity = None
+        quantityType = None
         author = None
 
         try:
             carbo = data['carbo']
-            measure = data['measure']
-            measureQuantity = data['measureQuantity']
+            measure = data['measure'] if data['measure'] else None
+            measureQuantity = data['measureQuantity'] if data['measureQuantity'] else None
             name = data['name']
-            description = data['description'] or ''
+            description = data['description'] if data['description'] else None
             quantity = data['quantity']
+            quantityType = MeasureType(data['quantityType'])
             author = data['userId']
         except Exception as err:
             return {"error": "Faltando dados"}, 400
@@ -50,7 +53,7 @@ class FoodRoute(Resource):
             return {"error": "Necessário informar medida e quantidade de medida."}, 400
 
 
-        food = Food(carbo=carbo, name=name, description=description, quantity=quantity, author=author)
+        food = Food(carbo=carbo, name=name, description=description, quantity=quantity, author=author, quantityType=quantityType)
         try:
             if measure != None:
                 food.measure = Measure(measure)
@@ -76,14 +79,18 @@ class FoodRoute(Resource):
         name = None
         description = None
         quantity = None
+        measureQuantity = None
+        quantityType = None
 
         try:
             carbo = data['carbo']
-            measure = data['measure']
-            measureQuantity = data['measureQuantity']
+            measure = data['measure'] if data['measure'] else None
+            measureQuantity = data['measureQuantity'] if data['measureQuantity'] else None
             name = data['name']
-            description = data['description'] or ''
+            description = data['description'] if data['description'] else None
             quantity = data['quantity']
+            quantityType = MeasureType(data['quantityType'])
+            measureQuantity = data['measureQuantity']
         except Exception as err:
             return {"error": "Missing data."}, 400
 
@@ -100,6 +107,8 @@ class FoodRoute(Resource):
             food.name = name
             food.description = description
             food.quantity = quantity
+            food.quantityType = quantityType
+
             db.session.add(food)
             db.session.commit()
 
@@ -138,11 +147,12 @@ class FoodByIdRoute(Resource):
             response = {
                 "id": food.id,
                 "name": food.name,
-                "description": food.description,
+                "description": None if not food.description else food.description,
                 "carbo": float(food.carbo),
                 "quantity": None if not food.quantity else float(food.quantity),
                 "measure": None if not food.measure else Measure(food.measure).value,
                 "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
+                "quantityType": food.quantityType,
                 "isFavorite": bool(isFavorite),
                 "user": {
                     "id": user.id,
@@ -194,6 +204,7 @@ class FoodByUserRoute(Resource):
                 "quantity": None if not food.quantity else float(food.quantity),
                 "measure": None if not food.measure else Measure(food.measure).value,
                 "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
+                "quantityType": food.quantityType,
                 "isFavorite": bool(isFavorite),
                 "user": {
                     "id": user.id,
@@ -243,6 +254,7 @@ class FoodListRoute(Resource):
                 "quantity": None if not food.quantity else float(food.quantity),
                 "measure": None if not food.measure else Measure(food.measure).value,
                 "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
+                "quantityType": food.quantityType,
                 "isFavorite": bool(isFavorite),
                 "user": {
                     "id": user.id,

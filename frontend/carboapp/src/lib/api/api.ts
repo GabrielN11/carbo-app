@@ -33,7 +33,7 @@ export async function apiPost<T, A>(url: string, model: A, sendToken?: boolean):
     loading.update(() => true)
     const token = localStorage.getItem('usertoken')
     const headers = {
-      'Authorization': sendToken ? token : undefined
+      'Authorization': sendToken ? 'Bearer ' + token : undefined
     }
 
     const {data} = await axios.post<T>(baseUrl + url, model, {headers})
@@ -56,7 +56,7 @@ export async function apiPut<T, A>(url: string, model: A, sendToken?: boolean): 
     loading.update(() => true)
     const token = localStorage.getItem('usertoken')
     const headers = {
-      'Authorization': sendToken ? token : undefined
+      'Authorization': sendToken ? 'Bearer ' + token : undefined
     }
 
     const {data} = await axios.put<T>(baseUrl + url, model, {headers})
@@ -79,7 +79,7 @@ export async function apiDelete<T, A>(url: string, sendToken?: boolean): Promise
     loading.update(() => true)
     const token = localStorage.getItem('usertoken')
     const headers = {
-      'Authorization': sendToken ? token : undefined
+      'Authorization': sendToken ? 'Bearer ' + token : undefined
     }
 
     const {data} = await axios.delete<T>(baseUrl + url, {headers})

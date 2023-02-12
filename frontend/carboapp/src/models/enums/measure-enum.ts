@@ -1,0 +1,7 @@
+export enum MeasureEnum{
+    SPOON = 1,
+    CUP = 2,
+    SCOOP = 3,
+    TEACUP = 4,
+    UNITY = 5
+}
