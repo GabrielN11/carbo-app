@@ -2,26 +2,38 @@
     import { goto } from "$app/navigation";
     import { page } from "$app/stores";
     import Card, { Content } from "@smui/card";
+	import List, { Item, Text } from "@smui/list";
     import getFoodById from "$lib/api/endpoints/food/get-food-by-id";
     import { isEmpty, toNumber } from "lodash-es";
     import { onMount } from "svelte";
     import FoodModel from "../../../models/food/food-model";
     import { displayToast } from "../../../stores/toast-store";
-    import { MeasureMock } from "$lib/mocks/measure-mock";
+    import Tooltip, { Wrapper } from '@smui/tooltip';
+	import Fab from '@smui/fab';
     import { MeasureTypeMock } from "$lib/mocks/measure-type-mock";
     import { MeasureEnum } from "../../../models/enums/measure-enum";
+    import { user } from "../../../stores/user-store";
+    import Menu from "@smui/menu";
+    import Button from "@smui/button";
+    import DeleteFood from "../../../components/delete-food/delete-food.svelte";
 
     let id: number;
+    let menu: Menu;
 
     let food: FoodModel = new FoodModel();
+    let favorite: boolean = false;
+
+    let openDelete: boolean = false;
 
     async function fetchFood() {
         try {
             const res = await getFoodById(id);
 
             food = res.data;
+            favorite = res.data.isFavorite;
         } catch (e: any) {
             displayToast(e.message, "#dc3545", 4000);
+            goto('/')
         }
     }
 
@@ -108,14 +120,43 @@
                 </div>
             {/if}
             <div>
-                <p>Publicado por {food.user.name}</p>
+                {#if $user && $user.id === food.user.id}
+                    
+                        <Wrapper>
+                            <button on:click={() => menu.setOpen(true)} class='settings-btn'>
+                            <iconify-icon icon="material-symbols:settings" class='favorite-btn' style="color: white;" width=25 ></iconify-icon>
+                            </button>
+                            <Tooltip>Opções</Tooltip>
+                        </Wrapper>
+                    <Menu bind:this={menu}>
+                        <List>
+                          <Item on:SMUI:action={() => console.log('clicou')}>
+                            <Text>Editar</Text>
+                          </Item>
+                          <Item on:SMUI:action={() => (openDelete = true)}>
+                            <Text>Excluir</Text>
+                          </Item>
+                        </List>
+                      </Menu>
+
+                      <DeleteFood id={id} open={openDelete} name={food.name} closeDialog={() => (openDelete = false)}/>
+                {:else}
+                    <p>Publicado por {food.user.name}</p>
+                {/if}
             </div>
             <div class='favorite'>
-                {#if food.isFavorite}
-                    <iconify-icon icon="material-symbols:favorite" style="color: #d20d0d;" width=25></iconify-icon>
+                {#if favorite}
+                <Wrapper>
+                    <iconify-icon icon="material-symbols:favorite-outline" class='favorite-btn' style="color: gray;" width=25></iconify-icon>
+                    <Tooltip>Remover Favorito</Tooltip>
+                  </Wrapper>
                 {:else}
-                    <iconify-icon icon="material-symbols:favorite-outline" style="color: gray;" width=25></iconify-icon>
+                <Wrapper>
+                    <iconify-icon icon="material-symbols:favorite-outline" class='favorite-btn' style="color: gray;" width=25></iconify-icon>
+                    <Tooltip>Favoritar</Tooltip>
+                  </Wrapper>
                 {/if}
+
             </div>
         </div>
     {/if}
@@ -129,7 +170,6 @@
         align-items: center;
         padding-top: 30px;
     }
-
     .description {
         margin-top: 0;
     }
@@ -161,5 +201,14 @@
         display: flex;
         justify-content: flex-end;
         align-items: center;
+    }
+
+    .favorite-btn{
+        cursor: pointer;
+    }
+
+    .settings-btn{
+        background: unset;
+        border: none;
     }
 </style>

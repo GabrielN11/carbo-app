@@ -1,12 +1,8 @@
 <script lang="ts">
-	import Icon from "@iconify/svelte";
-	import { getContext, afterUpdate } from "svelte";
-	import type UserModel from "../models/user/user-model";
 	import { page } from "$app/stores";
-	import type { Writable } from "svelte/store";
 	import { logout, user } from "../stores/user-store";
 	import Menu from "@smui/menu";
-	import List, { Item, Separator, Text } from "@smui/list";
+	import List, { Item, Text } from "@smui/list";
 	import Button, { Label } from "@smui/button";
 
 	let menu: Menu;

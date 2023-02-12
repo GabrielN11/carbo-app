@@ -12,6 +12,7 @@
     import FoodFormModel from '../../models/food/food-form-model';
     import { user } from '../../stores/user-store';
     import createFood from '$lib/api/endpoints/food/food-post';
+    import { goto } from '$app/navigation';
 
     export let open = true;
     export let closeHandler: () => void;
@@ -70,6 +71,7 @@
             measureQuantity = 0
 
             closeHandler()
+            goto(`/food/${res.data.id}`)
 
         }catch(e: any){
             displayToast(e.message, '#dc3545', 4000)
