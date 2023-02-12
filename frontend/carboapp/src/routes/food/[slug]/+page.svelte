@@ -15,6 +15,9 @@
     import Menu from "@smui/menu";
     import DeleteFood from "../../../components/delete-food/delete-food.svelte";
     import AddFood from "../../../components/add-food/add-food.svelte";
+    import deleteFavorite from "$lib/api/endpoints/favorite/delete-favorite";
+    import postFavorite from "$lib/api/endpoints/favorite/post-favorite";
+    import FavoriteModel from "../../../models/favorite/favorite-model";
 
     let id: number;
     let menu: Menu;
@@ -34,6 +37,17 @@
         } catch (e: any) {
             displayToast(e.message, "#dc3545", 4000);
             goto('/')
+        }
+    }
+
+    async function handleFavorite(){
+        try{
+            const res = favorite ? await deleteFavorite(id) : await postFavorite(new FavoriteModel(id))
+
+            favorite = !favorite
+            displayToast(res.message, '#28a745', 1500)
+        }catch(e: any){
+            displayToast(e.message, "#dc3545", 4000);
         }
     }
 
@@ -151,20 +165,25 @@
                     <p>Publicado por {food.user.name}</p>
                 {/if}
             </div>
+            {#if $user}
             <div class='favorite'>
                 {#if favorite}
-                <Wrapper>
-                    <iconify-icon icon="material-symbols:favorite-outline" class='favorite-btn' style="color: gray;" width=25></iconify-icon>
-                    <Tooltip>Remover Favorito</Tooltip>
-                  </Wrapper>
+                    <Wrapper>
+                        <button class='settings-btn' on:click={handleFavorite}>
+                        <iconify-icon icon="material-symbols:favorite" style="color: #d20d0d;" class='favorite-btn' width=25></iconify-icon>
+                        </button>
+                        <Tooltip>Remover Favorito</Tooltip>
+                     </Wrapper>
                 {:else}
-                <Wrapper>
-                    <iconify-icon icon="material-symbols:favorite-outline" class='favorite-btn' style="color: gray;" width=25></iconify-icon>
-                    <Tooltip>Favoritar</Tooltip>
-                  </Wrapper>
+                    <Wrapper>
+                        <button class='settings-btn' on:click={handleFavorite}>
+                        <iconify-icon icon="material-symbols:favorite-outline" class='favorite-btn' style="color: gray;" width=25></iconify-icon>
+                        </button>
+                        <Tooltip>Favoritar</Tooltip>
+                    </Wrapper>
                 {/if}
-
             </div>
+            {/if}
         </div>
     {/if}
 </section>
@@ -185,6 +204,7 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 10px;
+        width: 256px;
     }
 
     .card-content {
@@ -218,4 +238,11 @@
         background: unset;
         border: none;
     }
+
+    @media(min-width: 600px){
+        .card-container{
+            width: 400px;
+        }
+    }
+
 </style>

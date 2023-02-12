@@ -6,6 +6,8 @@ from src.server.instance import api, db
 
 from src.models.favorites import Favorite
 
+from sqlalchemy import and_
+
 from src.utils.authorization import userAuthorization
 from env import JWT_KEY
 
@@ -41,8 +43,9 @@ class FavoriteRoute(Resource):
 
     @userAuthorization
     def delete(self, id):
+        userId = jwt.decode(request.headers.get('Authorization').split()[1], JWT_KEY, algorithms="HS256")['id']
         try:
-            favorite = Favorite.query.filter_by(id=id).first()
+            favorite = Favorite.query.filter(and_(Favorite.userId == userId, Favorite.foodId == id)).first()
             db.session.delete(favorite)
             db.session.commit()
 

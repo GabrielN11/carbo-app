@@ -74,7 +74,7 @@ export async function apiPut<T, A>(url: string, model: A, sendToken?: boolean): 
   }
 }
 
-export async function apiDelete<T, A>(url: string, sendToken?: boolean): Promise<T>{
+export async function apiDelete<T>(url: string, sendToken?: boolean): Promise<T>{
   try{
     loading.update(() => true)
     const token = localStorage.getItem('usertoken')

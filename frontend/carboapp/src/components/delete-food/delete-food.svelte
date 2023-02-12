@@ -35,7 +35,7 @@
     <Button on:click={closeDialog}>
       <Label>Cancelar</Label>
     </Button>
-    <Button on:click={handleDelete}>
+    <Button on:click={handleDelete} variant='unelevated' color='primary'>
       <Label>Excluir</Label>
     </Button>
   </div>
