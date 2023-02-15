@@ -19,7 +19,7 @@
     export let closeHandler: () => void;
 
     //campos
-    export let id: number;
+    export let id: number | undefined;
     export let name: string = ''
     export let carbo: number = 0
     export let quantity: number = 0
@@ -91,7 +91,7 @@
         }
 
         try{
-            const res = await alterFood(id, new FoodFormModel(Number(carbo), name, Number(quantity), measureType, $user?.id, description, measure, measureQuantity))
+            const res = await alterFood(id!, new FoodFormModel(Number(carbo), name, Number(quantity), measureType, $user?.id, description, measure, measureQuantity))
 
             displayToast(res.message, '#28a745', 4000)
             

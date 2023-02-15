@@ -147,7 +147,7 @@
         </fieldset>
         <fieldset>
             <Button touch variant="outlined" color="secondary" type="submit" style='width: 100%'>
-                <Label>Entrar</Label>
+                <Label>Continuar</Label>
             </Button>
         </fieldset>
         <a href='/login'>Já tenho uma conta</a>

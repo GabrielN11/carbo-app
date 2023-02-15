@@ -229,12 +229,10 @@ class FoodByUserRoute(Resource):
 @api.route('/food-list')
 class FoodListRoute(Resource):
 
-    @userAuthorization
     def get(self):
         searchQuery = request.args.get('search')
         limit = 10
         page = 0
-        userId = jwt.decode(request.headers.get('Authorization').split()[1], JWT_KEY, algorithms="HS256")['id']
 
         try:
             page = int(request.args.get('page')) * 10
@@ -243,16 +241,13 @@ class FoodListRoute(Resource):
         try:
             food = []
             if searchQuery:
-                food = Food.query.filter(or_(Food.description.ilike("%"+searchQuery.lower()+"%"), Food.name.ilike("%"+searchQuery.lower()+"%"))).limit(limit).offset(page).all()
+                food = Food.query.filter(or_(Food.description.ilike("%"+searchQuery.lower()+"%"), Food.name.ilike("%"+searchQuery.lower()+"%"))).order_by(desc(Food.id)).limit(limit).offset(page).all()
             else:
                 food = Food.query.limit(limit).offset(page).all()
-            
-            if len(food) == 0:
-                return None, 204
 
             def formatPublication(food):
                 user = User.query.filter_by(id=food.author).first()
-                isFavorite = Favorite.query.filter(and_(Favorite.userId == userId, Favorite.foodId == food.id)).first()
+                isFavorite = Favorite.query.filter(and_(Favorite.userId == user.id, Favorite.foodId == food.id)).first()
                 return {
                 "id": food.id,
                 "name": food.name,
@@ -261,7 +256,7 @@ class FoodListRoute(Resource):
                 "quantity": None if not food.quantity else float(food.quantity),
                 "measure": None if not food.measure else Measure(food.measure).value,
                 "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
-                "quantityType": food.quantityType,
+                "quantityType": MeasureType(food.quantityType).value,
                 "isFavorite": bool(isFavorite),
                 "user": {
                     "id": user.id,

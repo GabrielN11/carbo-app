@@ -5,6 +5,7 @@
 	import Fab, { Icon } from '@smui/fab';
     import AddFood from '../components/add-food/add-food.svelte';
     import { user } from '../stores/user-store';
+    import FoodList from '../components/food-list/food-list.svelte';
 
 	let openDialog = false;
 </script>
@@ -15,10 +16,11 @@
 </svelte:head>
 
 <section>
+	<FoodList/>
 	{#if $user}
 	<AddFood open={openDialog} closeHandler={() => {
 		openDialog = false
-	}}/>
+	}} id={undefined}/>
 	<div class='fab-button'>
 		<Wrapper>
 			<Fab on:click={() => {
