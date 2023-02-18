@@ -4,13 +4,14 @@
     import getUserById from "$lib/api/endpoints/user/user-get-by-id";
     import { toNumber } from "lodash-es";
     import { onMount } from "svelte";
-    import UserModel from "../../../models/user/user-model";
+    import FoodList from "../../../components/food-list/food-list.svelte";
+    import UserProfileModel from "../../../models/user/user-profile-model";
     import { displayToast } from "../../../stores/toast-store";
     import { user } from "../../../stores/user-store";
 
     let id: number;
 
-    let userProfile: UserModel = new UserModel();
+    let userProfile: UserProfileModel = new UserProfileModel();
 
     async function fetchUser(){
         try{
@@ -19,6 +20,7 @@
             userProfile = res.data
         }catch(e: any){
             displayToast(e.message, '#dc3545', 4000)
+            goto('/')
         }
     }
 
@@ -36,18 +38,28 @@
 </script>
 
 <svelte:head>
-    <title>Carbo App - Validação</title>
+    <title>Carbo App - {userProfile.username}</title>
     <meta
         name="description"
-        content="Validar conta no Carbo App - Aplicativo para consulta de valores de 
-    carboidratos de alimentos"
+        content={`Perfil de ${userProfile.username} no Carbo App - Aplicativo para consulta de valores de 
+    carboidratos de alimentos`}
     />
 </svelte:head>
 
 <section>
-
+    <h2>{userProfile.username}</h2>
+    {#if userProfile.id > 0}
+        <FoodList profile profileId={userProfile.id}/>
+    {/if}
 </section>
 
 <style>
+    section {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 30px;
+    }
 
 </style>

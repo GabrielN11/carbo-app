@@ -147,7 +147,7 @@
             </Textfield>
         </fieldset>
         <fieldset>
-            <Select variant="filled" bind:value={measureType} label="Tipo de Medida" style='width: 100%'>
+            <Select variant="filled" bind:value={measureType} style='width: 100%'>
                 {#each MeasureTypeMock as mt}
                   <Option value={mt.key}>{mt.description}</Option>
                 {/each}
@@ -176,7 +176,7 @@
             </Textfield>
         </fieldset>
         <fieldset>
-            <Select variant="filled" bind:value={measure} label="Medida de Referência" style='width: 100%'>
+            <Select variant="filled" bind:value={measure} label={!measure ? "Medida de Referência" : undefined} style='width: 100%'>
                 <Option value={undefined}></Option>
                 {#each MeasureMock as mm}
                   <Option value={mm.key}>{mm.description}</Option>

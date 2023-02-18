@@ -4,6 +4,7 @@
 	import Menu from "@smui/menu";
 	import List, { Item, Text } from "@smui/list";
 	import Button, { Label } from "@smui/button";
+    import { goto } from "$app/navigation";
 
 	let menu: Menu;
 </script>
@@ -35,7 +36,7 @@
 			</Button>
 			<Menu bind:this={menu}>
 				<List>
-				  <Item on:SMUI:action={() => console.log('clicou')}>
+				  <Item on:SMUI:action={() => goto(`/perfil/${$user?.id}`)}>
 					<Text>Perfil</Text>
 				  </Item>
 				  <Item on:SMUI:action={() => logout()}>

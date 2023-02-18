@@ -1,8 +1,8 @@
 import { apiGet } from "$lib/api/api";
 import type { SuccessfullyResponse } from "$lib/api/api-models";
-import type UserModel from "../../../../models/user/user-model";
+import type UserProfileModel from "../../../../models/user/user-profile-model";
 
-export default async function getUserById(id: number): Promise<SuccessfullyResponse<UserModel>>{
-    const user = await apiGet<SuccessfullyResponse<UserModel>>(`/user/${id}`, false)
+export default async function getUserById(id: number): Promise<SuccessfullyResponse<UserProfileModel>>{
+    const user = await apiGet<SuccessfullyResponse<UserProfileModel>>(`/user/${id}`, false)
     return user
 }

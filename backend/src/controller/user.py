@@ -15,10 +15,7 @@ class UserRoute(Resource):
 
             user = {
                 "id": userData.id,
-                "username": userData.username,
-                "email": userData.email,
-                "admin": userData.admin,
-                "token": request.headers.get('Authorization').split()[1]
+                "username": userData.username
             }
             return {"message": "User data retrieved", "data": user}, 200
         except Exception as err:

@@ -162,7 +162,7 @@
                         name={food.name} carbo={food.carbo} description={food.description} measure={food.measure}
                         measureQuantity={food.measureQuantity} measureType={food.quantityType} quantity={food.quantity}/>
                 {:else}
-                    <p>Publicado por {food.user.name}</p>
+                    <p>Publicado por <a href={`/perfil/${food.user.id}`}>{food.user.name}</a></p>
                 {/if}
             </div>
             {#if $user}

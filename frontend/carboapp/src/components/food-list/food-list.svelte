@@ -7,11 +7,33 @@
     import getFood from "$lib/api/endpoints/food/get-food";
     import FoodCard from "../food-card/food-card.svelte";
     import { onMount } from "svelte";
+    import { listen } from "svelte/internal";
+    import getFoodByProfile from "$lib/api/endpoints/food/get-food-by-profile";
 
     let query: string = "";
     let page: number = 0;
 
     let foodList: FoodModel[] = [];
+
+    export const profile: boolean = false;
+    export const profileId: number | undefined = undefined;
+
+    async function onProfileSubmit(e?: SubmitEvent) {
+        if (e) {
+            e.preventDefault();
+            foodList = [];
+            page = 0;
+        }
+        try {
+            const res = await getFoodByProfile(profileId!, query, page);
+
+            foodList = [...foodList, ...res.data];
+
+            if (res.data.length === 10) page += 1;
+        } catch (e: any) {
+            displayToast(e.message, "#dc3545", 2500);
+        }
+    }
 
     async function onSubmit(e?: SubmitEvent) {
         if (e) {
@@ -30,7 +52,7 @@
         }
     }
 
-    onMount(() => onSubmit());
+    onMount(() => profile ? onProfileSubmit() : onSubmit());
 </script>
 
 <svelte:head>
@@ -43,9 +65,7 @@
 </svelte:head>
 
 <section>
-    <form
-        on:submit={onSubmit}
-    >
+    <form on:submit={profile ? onProfileSubmit : onSubmit}>
         <fieldset>
             <Textfield
                 style="width: 100%"
@@ -68,19 +88,24 @@
             </Button>
         </fieldset>
     </form>
-    <div class="list">
-        <List twoLine>
+    <div class="list-container">
+        <List twoLine class="demo-list">
             {#each foodList as food}
                 <FoodCard {food} />
             {/each}
         </List>
-        <Button touch variant='outlined' color='secondary'>
-            <Label>Carregar Mais</Label>
-        </Button>
+        {#if foodList.length % 10 === 0}
+            <Button touch variant="outlined" color="secondary">
+                <Label>Carregar Mais</Label>
+            </Button>
+        {/if}
     </div>
 </section>
 
 <style>
+    * :global(.demo-list) {
+        width: 600px;
+    }
     form {
         display: flex;
         flex-direction: column;
@@ -95,7 +120,7 @@
         border: none;
     }
 
-    .list {
+    .list-container {
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -106,6 +131,12 @@
     @media (min-width: 600px) {
         fieldset {
             width: 400px;
+        }
+    }
+
+    @media (max-width: 600px){
+        * :global(.demo-list) {
+            max-width: 300px;
         }
     }
 </style>
