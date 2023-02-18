@@ -195,10 +195,7 @@ class FoodByUserRoute(Resource):
                 food = Food.query.filter(and_(Food.author == id, Food.description.ilike("%"+searchQuery.lower()+"%"))).limit(limit).offset(page).all()
             else:
                 food = Food.query.filter(Food.author == id).limit(limit).offset(page).all()
-            
-            if len(food) == 0:
-                return None, 204
-
+                
             def formatPublication(food):
                 user = User.query.filter_by(id=food.author).first()
                 isFavorite = Favorite.query.filter(and_(Favorite.userId == id, Favorite.foodId == food.id)).first()
@@ -211,7 +208,7 @@ class FoodByUserRoute(Resource):
                 "quantity": None if not food.quantity else float(food.quantity),
                 "measure": None if not food.measure else Measure(food.measure).value,
                 "measureQuantity": None if not food.measureQuantity else int(food.measureQuantity),
-                "quantityType": food.quantityType,
+                "quantityType": MeasureType(food.quantityType).value,
                 "isFavorite": bool(isFavorite),
                 "user": {
                     "id": user.id,

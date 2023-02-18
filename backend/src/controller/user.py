@@ -5,7 +5,7 @@ from src.server.instance import api
 from src.models.user import User
 
 
-@api.route('/user/:id')
+@api.route('/user/<id>')
 class UserRoute(Resource):
    def get(self, id):
         try:
