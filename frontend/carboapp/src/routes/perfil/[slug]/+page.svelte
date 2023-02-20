@@ -3,7 +3,7 @@
     import { page } from "$app/stores";
     import getUserById from "$lib/api/endpoints/user/user-get-by-id";
     import { isEmpty, toNumber } from "lodash-es";
-    import { onMount } from "svelte";
+    import { afterUpdate, onMount } from "svelte";
     import FoodList from "../../../components/food-list/food-list.svelte";
     import UserProfileModel from "../../../models/user/user-profile-model";
     import { displayToast } from "../../../stores/toast-store";
@@ -17,6 +17,7 @@
     import UserPutModel from "../../../models/user/user-put-model";
 
     let id: number;
+    let previousPath: string;
 
     let edit: boolean = false;
     let username: string = ''
@@ -60,8 +61,9 @@
         }
     }
 
-    onMount(() => {
+    function triggerGet(){
         try {
+            previousPath = $page.url.pathname
             id = toNumber($page.url.pathname.split("/")[2]);
 
             if (isNaN(id)) throw new Error();
@@ -70,7 +72,17 @@
         } catch (e: any) {
             goto("/");
         }
+    }
+
+    onMount(() => {
+        triggerGet();
     });
+
+    afterUpdate(() => {
+        if($page.url.pathname !== previousPath){
+            triggerGet();
+        }
+    })
 </script>
 
 <svelte:head>

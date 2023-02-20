@@ -97,7 +97,7 @@
             </div>
 
             <div>
-                <Card variant="outlined">
+                <Card variant="outlined" style='height: 100%'>
                     <Content>
                         <div class="card-content">
                             <p>Carboidratos</p>
